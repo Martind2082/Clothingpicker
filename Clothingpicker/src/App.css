@@ -1,6 +1,5 @@
 .popup {
   width: 40%;
-  height: 5rem;
   background: rgb(229, 87, 87);
   font-weight: bold;
   color: white;
@@ -14,4 +13,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
+  padding: 1rem 2rem;
 }
