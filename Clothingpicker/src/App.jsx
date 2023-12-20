@@ -4,16 +4,21 @@ import './index.css';
 import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from 'firebase/auth';
 import {app, auth, db} from './Firebase';
 import GoogleButton from 'react-google-button';
-import { collection, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
 import { FaWind } from "react-icons/fa";
 import { FaGauge } from "react-icons/fa6";
 import { CiDroplet } from "react-icons/ci";
 import WardrobeImg from './Images/Wardrobeimg.png';
+import {storage} from './Firebase';
+import { getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
+import {v4} from 'uuid';
+
 
 
 function App() {
   const [User, setUser] = useState('');
   const [Location, setLocation] = useState('');
+  
 
   function signinwithgoogle() {
     const provider = new GoogleAuthProvider();
@@ -50,6 +55,15 @@ function App() {
           })
           .then(data => {
             if (data.message == "city not found") {
+              if (!document.querySelector('.popup')) {
+                let popup = document.createElement('div');
+                popup.textContent = "City not found";
+                popup.classList.add("popup");
+                document.body.append(popup);
+                setTimeout(() => {
+                  popup.remove();
+                }, 2000);
+              }
               return;
             }
             city.current.textContent = data.name + ", " + data.sys.country;
@@ -66,22 +80,53 @@ function App() {
             pressure.current.textContent = " Pressure: " + data.main.pressure + " millibars";
             wind.current.textContent = "Wind: " + data.wind.speed + " km/h";
           })
-          .catch(err => {
-            if (!document.querySelector('.popup')) {
-              let popup = document.createElement('div');
-              popup.textContent = "City not found";
-              popup.classList.add("popup");
-              document.body.append(popup);
-              setTimeout(() => {
-                popup.remove();
-              }, 2000);
-            }
-          })
 
       }
     }
     getlocation()
   }
+
+  //puts clothes from firebase into wardrobe when page loads
+    const wardrobeshoes = useRef();
+    const wardrobejackets = useRef();
+    const wardrobeshirts = useRef();
+    const wardrobepants = useRef();
+    
+  const [jacketsarr, setjacketsarr] = useState([]);
+  if (User) {
+    let length;
+    async function getJackets() {
+      wardrobejackets.current.textContent = "";
+      const unsub = onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
+        length = snapshot.docs.length;
+        snapshot.docs.forEach(jacket => {
+          setjacketsarr([...jacketsarr, jacket])
+          // let img = document.createElement('img');
+          // img.src = jacket.data().url;
+          // img.id = jacket.id;
+          // img.classList.add("wardrobeimg");
+          // wardrobejackets.current.append(img);
+        })
+      })
+      return unsub;
+    }
+    setTimeout(() => {
+      getJackets().then(() => {
+        // setTimeout(() => {
+        //   for (let i = 0; i < 3; i++) {
+        //     console.log(i);
+        //   }
+        //   for (let i = length; i < wardrobejackets.current.children.length - length; i++) {
+        //     wardrobejackets.current.removeChild(wardrobejackets.current.children[i])
+        //   }
+        // }, 300);
+      })
+    }, 350);
+  }
+  // useEffect(() => {
+  //   console.log("I ran");
+  // }, [jacketsarr])
+
 
   //gets the weather of the city the user enters
   function getWeather(e) {
@@ -92,20 +137,18 @@ function App() {
           return res.json();
         })
         .then(data => {
-          console.log(data)
-        })
-        .catch(err => {
-          if (!document.querySelector('.popup')) {
-            let popup = document.createElement('div');
-            popup.textContent = "City not found";
-            popup.classList.add("popup");
-            document.body.append(popup);
-            setTimeout(() => {
-              popup.remove();
-            }, 2000);
+          if (data.message == "city not found") {
+            if (!document.querySelector('.popup')) {
+              let popup = document.createElement('div');
+              popup.textContent = "City not found";
+              popup.classList.add("popup");
+              document.body.append(popup);
+              setTimeout(() => {
+                popup.remove();
+              }, 2000);
+            }
           }
         })
-      
         setDoc(doc(db, User.email, "location"), {
           location: city
         })
@@ -129,8 +172,8 @@ function App() {
   const clothingtypeselect = useRef();
   const clothingcolorselect = useRef();
 
-  const [collectionlength, setcollectionlength] = useState();
   function addToWardrobe() {
+    let color = clothingcolorselect.current.value;
     let type;
     if (chosenimage.current.src.length !== 0 && clothingtypeselect.current.value !== "Select Type of Clothing" && clothingcolorselect.current.value !== "Select Clothing Color") {
       if (clothingtypeselect.current.value == "Jacket/Hoodie") {
@@ -142,18 +185,28 @@ function App() {
       } else {
         type = "shoe";
       }
-
-      const unsub = onSnapshot(collection(db, User.email + " " + type), (snapshot) => {
-        setcollectionlength(snapshot.docs.length)
-        return unsub;
-      })
-      setTimeout(() => {
-        setDoc(doc(db, User.email + " " + type, collectionlength.toString()), {
-          src: chosenimage.current.src,
-          color: clothingcolorselect.current.value,
-          id: collectionlength
+      //puts image into firebase storage
+      const imageRef = ref(storage, `${User.email + type}/${v4()}`);
+      uploadBytes(imageRef, imageinput.current.files[0])
+        .then(() => {
+          const imageListRef = ref(storage, `${User.email + type}/`);
+          listAll(imageListRef)
+            .then(response => {
+              getDownloadURL(response.items[response.items.length - 1]).then(url => {
+                addDoc(collection(db, `${User.email + type}`), {
+                  url: url,
+                  color: color
+                })
+              })
+            })
         })
-      }, 500);
+        .then(() => {
+          //resets add item to wardrobe section
+          imageinput.current.value = "";
+          chosenimage.current.src = "https://www.ledr.com/colours/white.jpg";
+          clothingtypeselect.current.value = "Select Type of Clothing";
+          clothingcolorselect.current.value = "Select Clothing Color";
+        })
 
     } else {
       let popup = document.createElement('div');
@@ -165,6 +218,7 @@ function App() {
       }, 2000);
     }
   }
+
   return (
     <div>
       {
@@ -244,8 +298,12 @@ function App() {
                   </div>
 
                   {/* wardrobe */}
-                  <div>
-                    <img className='w-full mt-8' src={WardrobeImg}/>
+                  <div className='relative w-[80vw] h-[150vh]'>
+                    <img className='w-full h-full mt-8 absolute' src={WardrobeImg}/>
+                    <div ref={wardrobeshoes} className='absolute flex w-[50%] h-[10rem] bg-black top-[15%] left-[25%]'></div>
+                    <div ref={wardrobejackets} className='absolute flex w-[50%] h-[10rem] top-[40%] left-[25%]'></div>
+                    <div ref={wardrobeshirts} className='absolute flex w-[50%] h-[10rem] bg-black top-[55%] left-[25%]'></div>
+                    <div ref={wardrobepants} className='absolute flex w-[50%] h-[10rem] bg-black top-[72%] left-[25%]'></div>
                   </div>
 
             </div> 
