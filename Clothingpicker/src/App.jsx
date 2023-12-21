@@ -12,7 +12,9 @@ import WardrobeImg from './Images/Wardrobeimg.png';
 import {storage} from './Firebase';
 import { getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
 import {v4} from 'uuid';
-
+import {Swiper, SwiperSlide} from "swiper/react";
+import 'swiper/swiper-bundle.min.css';
+import 'swiper/swiper.min.css';
 
 
 function App() {
@@ -87,45 +89,45 @@ function App() {
   }
 
   //puts clothes from firebase into wardrobe when page loads
-    const wardrobeshoes = useRef();
-    const wardrobejackets = useRef();
-    const wardrobeshirts = useRef();
-    const wardrobepants = useRef();
+  const wardrobeshoes = useRef();
+  const wardrobejackets = useRef();
+  const wardrobeshirts = useRef();
+  const wardrobepants = useRef();
     
   const [jacketsarr, setjacketsarr] = useState([]);
-  if (User) {
-    let length;
-    async function getJackets() {
-      wardrobejackets.current.textContent = "";
-      const unsub = onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
-        length = snapshot.docs.length;
+  // setjacketsarr('hi');
+  const [length, setlength] = useState();
+  let arr = []
+    if (User) {
+      onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
+        setlength(snapshot.docs.length);
         snapshot.docs.forEach(jacket => {
-          setjacketsarr([...jacketsarr, jacket])
+          arr.push(jacket);
           // let img = document.createElement('img');
           // img.src = jacket.data().url;
           // img.id = jacket.id;
           // img.classList.add("wardrobeimg");
-          // wardrobejackets.current.append(img);
+          // setTimeout(() => {
+          //   wardrobejackets.current.append(img);
+          // }, 200);
         })
       })
-      return unsub;
     }
-    setTimeout(() => {
-      getJackets().then(() => {
-        // setTimeout(() => {
-        //   for (let i = 0; i < 3; i++) {
-        //     console.log(i);
-        //   }
-        //   for (let i = length; i < wardrobejackets.current.children.length - length; i++) {
-        //     wardrobejackets.current.removeChild(wardrobejackets.current.children[i])
-        //   }
-        // }, 300);
-      })
-    }, 350);
-  }
-  // useEffect(() => {
-  //   console.log("I ran");
-  // }, [jacketsarr])
+
+  useEffect(() => {
+    if (User) {
+      setTimeout(() => {
+        // let i = length;
+        // while (wardrobejackets.current.children[i]) {
+        //   wardrobejackets.current.removeChild(wardrobejackets.current.children[i])
+        // }
+        setjacketsarr(arr)
+      }, 1000);
+    }
+  }, [length])
+  useEffect(() => {
+console.log(jacketsarr);
+  }, [jacketsarr])
 
 
   //gets the weather of the city the user enters
@@ -301,7 +303,15 @@ function App() {
                   <div className='relative w-[80vw] h-[150vh]'>
                     <img className='w-full h-full mt-8 absolute' src={WardrobeImg}/>
                     <div ref={wardrobeshoes} className='absolute flex w-[50%] h-[10rem] bg-black top-[15%] left-[25%]'></div>
-                    <div ref={wardrobejackets} className='absolute flex w-[50%] h-[10rem] top-[40%] left-[25%]'></div>
+                    <div ref={wardrobejackets} className='absolute border-2 border-black w-[50%] h-[10rem] top-[40%] left-[25%]'>
+                      <Swiper className='border-red-500 border-2 w-full h-full flex' slidesPerView={3}>
+                      {
+                        jacketsarr.map(jacket => {
+                          return <SwiperSlide className='w-[3rem] h-[3rem] bg-red-500' key={jacket.id}><img className='w-full h-full object-contain' src={jacket.data().url}/></SwiperSlide>
+                        })
+                      }
+                      </Swiper>
+                    </div>
                     <div ref={wardrobeshirts} className='absolute flex w-[50%] h-[10rem] bg-black top-[55%] left-[25%]'></div>
                     <div ref={wardrobepants} className='absolute flex w-[50%] h-[10rem] bg-black top-[72%] left-[25%]'></div>
                   </div>
