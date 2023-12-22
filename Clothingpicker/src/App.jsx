@@ -4,7 +4,7 @@ import './index.css';
 import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from 'firebase/auth';
 import {app, auth, db} from './Firebase';
 import GoogleButton from 'react-google-button';
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { FaWind } from "react-icons/fa";
 import { FaGauge } from "react-icons/fa6";
 import { CiDroplet } from "react-icons/ci";
@@ -94,40 +94,91 @@ function App() {
   const wardrobeshirts = useRef();
   const wardrobepants = useRef();
     
+  //jackets
   const [jacketsarr, setjacketsarr] = useState([]);
-  // setjacketsarr('hi');
-  const [length, setlength] = useState();
-  let arr = []
+  const [jacketslength, setjacketslength] = useState();
+  //make a separate array because changing the jacketsarr state causes infinite runs
+  let jarr = [];
     if (User) {
-      onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
-        setlength(snapshot.docs.length);
+      onSnapshot(query(collection(db, `${User.email}jacket`), orderBy('createdAt', 'desc')), (snapshot) => {
+        setjacketslength(snapshot.docs.length);
         snapshot.docs.forEach(jacket => {
-          arr.push(jacket);
-          // let img = document.createElement('img');
-          // img.src = jacket.data().url;
-          // img.id = jacket.id;
-          // img.classList.add("wardrobeimg");
-          // setTimeout(() => {
-          //   wardrobejackets.current.append(img);
-          // }, 200);
+          jarr.push(jacket);
         })
       })
     }
-
   useEffect(() => {
     if (User) {
       setTimeout(() => {
-        // let i = length;
-        // while (wardrobejackets.current.children[i]) {
-        //   wardrobejackets.current.removeChild(wardrobejackets.current.children[i])
-        // }
-        setjacketsarr(arr)
-      }, 1000);
+        jarr = jarr.slice(0, jacketslength);
+        setjacketsarr(jarr);
+      }, 500);
     }
-  }, [length])
+  }, [jacketslength])
+
+  //shirts
+  const [shirtsarr, setshirtsarr] = useState([]);
+  const [shirtslength, setshirtslength] = useState();
+  let sarr = [];
+  if (User) {
+    onSnapshot(query(collection(db, `${User.email}shirt`), orderBy('createdAt', 'desc')), (snapshot) => {
+      setshirtslength(snapshot.docs.length);
+      snapshot.docs.forEach(shirt => {
+        sarr.push(shirt);
+      })
+    })
+  }
   useEffect(() => {
-console.log(jacketsarr);
-  }, [jacketsarr])
+    if (User) {
+      setTimeout(() => {
+        sarr = sarr.slice(0, shirtslength);
+        setshirtsarr(sarr);
+      }, 500);
+    }
+  }, [shirtslength])
+
+  //pants
+  const [pantsarr, setpantsarr] = useState([]);
+  const [pantslength, setpantslength] = useState();
+  let parr = [];
+  if (User) {
+    onSnapshot(query(collection(db, `${User.email}pants`), orderBy('createdAt', 'desc')), (snapshot) => {
+      setpantslength(snapshot.docs.length);
+      snapshot.docs.forEach(pant => {
+        parr.push(pant);
+      })
+    })
+  }
+  useEffect(() => {
+    if (User) {
+      setTimeout(() => {
+        parr = parr.slice(0, pantslength);
+        setpantsarr(parr);
+      }, 500);
+    }
+  }, [pantslength])
+
+  //shoes
+  const [shoesarr, setshoesarr] = useState([]);
+  const [shoeslength, setshoeslength] = useState();
+  let sharr = [];
+  if (User) {
+    onSnapshot(query(collection(db, `${User.email}shoe`), orderBy('createdAt', 'desc')), (snapshot) => {
+      setshoeslength(snapshot.docs.length);
+      snapshot.docs.forEach(shoe => {
+        sharr.push(shoe)
+      })
+    })
+  }
+  useEffect(() => {
+    if (User) {
+      setTimeout(() => {
+        sharr = sharr.slice(0, shoeslength);
+        setshoesarr(sharr);
+      }, 500);
+    }
+  }, [shoeslength])
+
 
 
   //gets the weather of the city the user enters
@@ -157,9 +208,7 @@ console.log(jacketsarr);
         setLocation(city);
 
 
-    } else {
-      return;
-    }
+    } else return
   }
 
   //when user chooses their clothing image
@@ -190,18 +239,15 @@ console.log(jacketsarr);
       //puts image into firebase storage
       const imageRef = ref(storage, `${User.email + type}/${v4()}`);
       uploadBytes(imageRef, imageinput.current.files[0])
-        .then(() => {
-          const imageListRef = ref(storage, `${User.email + type}/`);
-          listAll(imageListRef)
-            .then(response => {
-              getDownloadURL(response.items[response.items.length - 1]).then(url => {
-                addDoc(collection(db, `${User.email + type}`), {
-                  url: url,
-                  color: color
-                })
-              })
-            })
+      .then(() => {
+        getDownloadURL(imageRef).then(url => {
+          addDoc(collection(db, `${User.email + type}`), {
+            createdAt: serverTimestamp(),
+            url: url,
+            color: color
+          })
         })
+      })
         .then(() => {
           //resets add item to wardrobe section
           imageinput.current.value = "";
@@ -270,7 +316,7 @@ console.log(jacketsarr);
                             <option>Orange</option>
                             <option>Yellow</option>
                             <option>Green</option>
-                            <option>blue</option>
+                            <option>Blue</option>
                             <option>Purple</option>
                           </select>
                           <br/>
@@ -300,20 +346,44 @@ console.log(jacketsarr);
                   </div>
 
                   {/* wardrobe */}
-                  <div className='relative w-[80vw] h-[150vh]'>
+                  <div className='relative left-2/4 -translate-x-2/4 w-[80vw] h-[150vh]'>
                     <img className='w-full h-full mt-8 absolute' src={WardrobeImg}/>
-                    <div ref={wardrobeshoes} className='absolute flex w-[50%] h-[10rem] bg-black top-[15%] left-[25%]'></div>
-                    <div ref={wardrobejackets} className='absolute border-2 border-black w-[50%] h-[10rem] top-[40%] left-[25%]'>
-                      <Swiper className='border-red-500 border-2 w-full h-full flex' slidesPerView={3}>
+                    <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
+                      <Swiper className='w-full h-full' slidesPerView={3}>
+                        {
+                          shoesarr.map(shoe => {
+                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={shoe.id}><img className='w-full h-full object-contain' src={shoe.data().url}/></SwiperSlide>
+                          })
+                        }
+                      </Swiper>
+                    </div>
+                    <div ref={wardrobejackets} className='absolute w-[50%] h-[10rem] top-[40%] left-[25%]'>
+                      <Swiper className='w-full h-full' slidesPerView={3}>
                       {
                         jacketsarr.map(jacket => {
-                          return <SwiperSlide className='w-[3rem] h-[3rem] bg-red-500' key={jacket.id}><img className='w-full h-full object-contain' src={jacket.data().url}/></SwiperSlide>
+                          return <SwiperSlide className='w-[3rem] h-[3rem]' id={jacket.id}><img className='w-full h-full object-contain' src={jacket.data().url}/></SwiperSlide>
                         })
                       }
                       </Swiper>
                     </div>
-                    <div ref={wardrobeshirts} className='absolute flex w-[50%] h-[10rem] bg-black top-[55%] left-[25%]'></div>
-                    <div ref={wardrobepants} className='absolute flex w-[50%] h-[10rem] bg-black top-[72%] left-[25%]'></div>
+                    <div ref={wardrobeshirts} className='absolute w-[50%] h-[10rem] top-[55%] left-[25%]'>
+                      <Swiper className='w-full h-full' slidesPerView={3}>
+                        {
+                          shirtsarr.map(shirt => {
+                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={shirt.id}><img className='w-full h-full object-contain' src={shirt.data().url}/></SwiperSlide>
+                          })
+                        }
+                      </Swiper>
+                    </div>
+                    <div ref={wardrobepants} className='absolute w-[50%] h-[10rem] top-[72%] left-[25%]'>
+                      <Swiper className='w-full h-full' slidesPerView={3}>
+                        {
+                          pantsarr.map(pant => {
+                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={pant.id}><img className='w-full h-full object-contain' src={pant.data().url}/></SwiperSlide>
+                          })
+                        }
+                      </Swiper>
+                    </div>
                   </div>
 
             </div> 
