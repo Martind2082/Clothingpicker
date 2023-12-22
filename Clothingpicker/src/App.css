@@ -21,3 +21,19 @@
   width: 6rem;
   height: 6rem;
 }
+
+.clothingoptions {
+  width: 10rem;
+  height: 5rem;
+  position: absolute;
+  right: 0;
+  bottom: -100%;
+  background: white;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  transition: 1s;
+}
+.slide:hover .clothingoptions {
+  bottom: 0%;
+}

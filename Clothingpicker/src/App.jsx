@@ -4,13 +4,13 @@ import './index.css';
 import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from 'firebase/auth';
 import {app, auth, db} from './Firebase';
 import GoogleButton from 'react-google-button';
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { FaWind } from "react-icons/fa";
 import { FaGauge } from "react-icons/fa6";
 import { CiDroplet } from "react-icons/ci";
 import WardrobeImg from './Images/Wardrobeimg.png';
 import {storage} from './Firebase';
-import { getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
 import {v4} from 'uuid';
 import {Swiper, SwiperSlide} from "swiper/react";
 import 'swiper/swiper-bundle.min.css';
@@ -241,7 +241,11 @@ function App() {
       uploadBytes(imageRef, imageinput.current.files[0])
       .then(() => {
         getDownloadURL(imageRef).then(url => {
-          addDoc(collection(db, `${User.email + type}`), {
+          let location = imageRef._location.path_.split("/");
+          location.splice(0, 1);
+          setDoc(doc(db, `${User.email + type}`, location.join('')), {
+            type: type,
+            storagelocation: imageRef._location.path_,
             createdAt: serverTimestamp(),
             url: url,
             color: color
@@ -265,6 +269,13 @@ function App() {
         popup.remove();
       }, 2000);
     }
+  }
+
+  function deleteclothing(clothing) {
+    deleteObject(ref(storage, clothing.data().storagelocation));
+    let location = clothing.data().storagelocation.split('/');
+    location.splice(0, 1);
+    deleteDoc(doc(db, `${User.email + clothing.data().type}`, location.join('')))
   }
 
   return (
@@ -345,20 +356,29 @@ function App() {
                       </div>
                   </div>
 
+                  <div className='text-[4rem] w-full text-center mt-8 border-t-[3px] border-t-gray-400'>My Wardrobe</div>
+
                   {/* wardrobe */}
                   <div className='relative left-2/4 -translate-x-2/4 w-[80vw] h-[150vh]'>
                     <img className='w-full h-full mt-8 absolute' src={WardrobeImg}/>
+                    <div className='absolute text-white font-bold text-[1.5rem] top-[20%] left-[12%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
-                      <Swiper className='w-full h-full' slidesPerView={3}>
+                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shoesarr.map(shoe => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={shoe.id}><img className='w-full h-full object-contain' src={shoe.data().url}/></SwiperSlide>
+                            return <SwiperSlide className='w-full h-full flex items-start slide' id={shoe.id}>
+                              <img className='w-full h-full object-contain' src={shoe.data().url}/>
+                              <div className='clothingoptions'>
+                                <button onClick={() => deleteclothing(shoe)} className='deleteclothing'>Delete</button>
+                              </div>
+                            </SwiperSlide>
                           })
                         }
                       </Swiper>
                     </div>
+                    <div className='absolute text-white font-bold text-[1.5rem] top-[40%] left-[10%] w-[4rem]'>Jackets and Hoodies</div>
                     <div ref={wardrobejackets} className='absolute w-[50%] h-[10rem] top-[40%] left-[25%]'>
-                      <Swiper className='w-full h-full' slidesPerView={3}>
+                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                       {
                         jacketsarr.map(jacket => {
                           return <SwiperSlide className='w-[3rem] h-[3rem]' id={jacket.id}><img className='w-full h-full object-contain' src={jacket.data().url}/></SwiperSlide>
@@ -366,8 +386,9 @@ function App() {
                       }
                       </Swiper>
                     </div>
+                    <div className='absolute text-white font-bold text-[1.5rem] top-[60%] left-[12%]'>Shirts</div>
                     <div ref={wardrobeshirts} className='absolute w-[50%] h-[10rem] top-[55%] left-[25%]'>
-                      <Swiper className='w-full h-full' slidesPerView={3}>
+                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shirtsarr.map(shirt => {
                             return <SwiperSlide className='w-[3rem] h-[3rem]' id={shirt.id}><img className='w-full h-full object-contain' src={shirt.data().url}/></SwiperSlide>
@@ -375,8 +396,9 @@ function App() {
                         }
                       </Swiper>
                     </div>
+                    <div className='absolute text-white font-bold text-[1.5rem] top-[72%] left-[10%] w-[4rem]'>Pants and Shorts</div>
                     <div ref={wardrobepants} className='absolute w-[50%] h-[10rem] top-[72%] left-[25%]'>
-                      <Swiper className='w-full h-full' slidesPerView={3}>
+                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           pantsarr.map(pant => {
                             return <SwiperSlide className='w-[3rem] h-[3rem]' id={pant.id}><img className='w-full h-full object-contain' src={pant.data().url}/></SwiperSlide>
