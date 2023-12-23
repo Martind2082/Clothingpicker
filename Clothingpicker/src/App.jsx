@@ -45,10 +45,11 @@ function App() {
   const humidity = useRef();
   const pressure = useRef();
   const wind = useRef();
+
   if (User) {
     async function getlocation() {
       const docSnap = await getDoc(doc(db, User.email, "location"));
-      if (docSnap.data().location) {
+      if (docSnap.data()) {
         setLocation(docSnap.data().location);
 
         fetch(`https://api.openweathermap.org/data/2.5/weather?q=${docSnap.data().location}&appid=b3232114c48c4d247bf589c1e80c8834`)
@@ -234,12 +235,13 @@ function App() {
     }
     let color = clothingcolorselect.current.value;
     let type;
+    let specifictype = clothingtypeselect.current.value;
     if (chosenimage.current.src.length !== 0 && clothingtypeselect.current.value !== "Select Type of Clothing" && clothingcolorselect.current.value !== "Select Clothing Color") {
-      if (clothingtypeselect.current.value == "Jacket/Hoodie") {
+      if (clothingtypeselect.current.value == "Jacket" || clothingtypeselect.current.value == "Hoodie") {
         type = "jacket";
-      } else if (clothingtypeselect.current.value == "Shirt") {
+      } else if (clothingtypeselect.current.value == "Shirt" || clothingtypeselect.current.value == "T-Shirt") {
         type = "shirt";
-      } else if (clothingtypeselect.current.value == "Pants/Shorts") {
+      } else if (clothingtypeselect.current.value == "Pants" || clothingtypeselect.current.value == "Shorts") {
         type = "pants";
       } else {
         type = "shoe";
@@ -252,6 +254,7 @@ function App() {
           let location = imageRef._location.path_.split("/");
           location.splice(0, 1);
           setDoc(doc(db, `${User.email + type}`, location.join('')), {
+            specifictype: specifictype,
             type: type,
             storagelocation: imageRef._location.path_,
             createdAt: serverTimestamp(),
@@ -288,14 +291,18 @@ function App() {
     deleteDoc(doc(db, `${User.email + clothing.data().type}`, location.join('')))
   }
 
-  const clothingoptions = useRef();
-  function openclothingoptions() {
-    // if (clothingoptions.current.style.bottom == '-100%') {
-    //   clothingoptions.current.style.bottom = '0%';
-    // } else {
-    //   clothingoptions.current.style.bottom = '-100%';
-    // }
-  }
+  // function getweatheroutfit() {
+  //   let temp = temperature.current.textContent.split('');
+  //   temp.splice(-2)
+  //   temp = temp.join('');
+  //   if (temp >= 80) {
+
+  //   } else if (temp >= 70) {
+
+  //   } else {
+
+  //   }
+  // }
 
   return (
     <div>
@@ -334,9 +341,12 @@ function App() {
                           </div>
                           <select ref={clothingtypeselect} className='border-black border rounded ml-4 mb-4'>
                             <option>Select Type of Clothing</option>
-                            <option>Jacket/Hoodie</option>
+                            <option>Jacket</option>
+                            <option>Hoodie</option>
                             <option>Shirt</option>
-                            <option>Pants/Shorts</option>
+                            <option>T-Shirt</option>
+                            <option>Pants</option>
+                            <option>Shorts</option>
                             <option>Shoe</option>
                           </select>
                           <br/>
@@ -351,13 +361,13 @@ function App() {
                           </select>
                           <br/>
                           <div className='mb-4 flex justify-center'>
-                            <button ref={addtowardrobebutton} onClick={addToWardrobe} className=' bg-black text-white px-3 py-1 rounded-lg w-[80%]'>Add to Wardrobe!</button>
+                            <button ref={addtowardrobebutton} onClick={addToWardrobe} className=' bg-black text-white px-3 py-1 rounded-lg w-[80%] hover:underline'>Add to Wardrobe!</button>
                           </div>
                         </div>
                       </div>
 
                       <div className='bg-gradient-to-r from-teal-600 to-blue-600 w-[49%] p-8 flex flex-col items-center rounded-md'>
-                        <input placeholder='Change your city' className='border border-black p-[3px] w-[50%] ' onKeyDown={(e) => getWeather(e)} type="text" />
+                        <input placeholder='Change your city' className='border border-black p-[3px] pl-[0.5rem] w-[50%] ' onKeyDown={(e) => getWeather(e)} type="text" />
                         <p className='text-white my-2'>{new Date().toDateString()}</p>
                         <p className='text-white font-bold text-[1.5rem]' ref={city}></p>
                         <p className='text-white my-3' ref={weather}></p>
@@ -375,19 +385,32 @@ function App() {
                       </div>
                   </div>
 
-                  <div className='text-[4rem] w-full text-center mt-8 border-t-[3px] border-t-gray-400'>My Wardrobe</div>
+                  <div className='w-full h-[60vh] flex mt-8 border-t-[3px] border-t-gray-400'>
+                    <div className='w-2/4 border-r-[3px] border-gray-400'>
+                      <p className='text-[1.5rem] text-center mt-4'>Outfit recommended for <span ref={city}></span> weather</p>
+                    </div>
+                    <div className='w-2/4'>
+                      <p className='text-[1.5rem] text-center mt-4'>My Outfit</p>
+                      <p className='text-center text-[1.2rem]'>Pick out your outfit in the wardrobe below!</p>
+                    </div>
+                  </div>
+
+                  <div className='w-full text-center mt-8 border-t-[3px] border-t-gray-400'>
+                    <p className='text-[4rem]'>My Wardrobe</p>
+                    <div className='text-[1.2rem] mt-4 px-[4rem]'>To add a clothing item to your outfit or delete an item, hover over it or click on it if you are on a mobile device</div>
+                  </div>
 
                   {/* wardrobe */}
-                  <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[80vh] md:h-[150vh]'>
+                  <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[80vh] md:h-[120vh]'>
                     <img className='w-full h-full mt-8 absolute wardrobeimg' src={WardrobeImg}/>
                     <div className='absolute text-white font-bold text-[1.5rem] top-[20%] left-[12%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shoesarr.map(shoe => {
-                            return <SwiperSlide className='w-full h-full slide' onClick={openclothingoptions} id={shoe.id}>
+                            return <SwiperSlide className='w-full h-full slide'  id={shoe.id}>
                               <img className='w-full h-full object-contain' src={shoe.data().url}/>
-                              <div ref={clothingoptions} className='clothingoptions'>
+                              <div className='clothingoptions'>
                                 <button onClick={() => deleteclothing(shoe)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
                               </div>
                             </SwiperSlide>
@@ -400,9 +423,9 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                       {
                         jacketsarr.map(jacket => {
-                          return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={jacket.id}>
+                          return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={jacket.id}>
                             <img className='w-full h-full object-contain' src={jacket.data().url}/>
-                            <div ref={clothingoptions} className='clothingoptions'>
+                            <div className='clothingoptions'>
                               <button onClick={() => deleteclothing(jacket)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
                             </div>
                           </SwiperSlide>
@@ -415,9 +438,9 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shirtsarr.map(shirt => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={shirt.id}>
+                            return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={shirt.id}>
                               <img className='w-full h-full object-contain' src={shirt.data().url}/>
-                              <div ref={clothingoptions} className='clothingoptions'>
+                              <div className='clothingoptions'>
                                 <button onClick={() => deleteclothing(shirt)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
                               </div>
                             </SwiperSlide>
@@ -430,9 +453,9 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           pantsarr.map(pant => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={pant.id}>
+                            return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={pant.id}>
                               <img className='w-full h-full object-contain' src={pant.data().url}/>
-                              <div ref={clothingoptions} className='clothingoptions'>
+                              <div className='clothingoptions'>
                                 <button onClick={() => deleteclothing(pant)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
                               </div>
                             </SwiperSlide>
