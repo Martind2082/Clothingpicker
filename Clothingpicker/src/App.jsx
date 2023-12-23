@@ -222,8 +222,16 @@ function App() {
   //adds clothing item to wardrobe
   const clothingtypeselect = useRef();
   const clothingcolorselect = useRef();
+  const [addingtowardrobe, setaddingtowardrobe] = useState(false);
+  const addtowardrobebutton = useRef();
 
   function addToWardrobe() {
+    if (addingtowardrobe) {
+      return
+    } else {
+      setaddingtowardrobe(true);
+      addtowardrobebutton.current.style.background = '#c7bcbb';
+    }
     let color = clothingcolorselect.current.value;
     let type;
     if (chosenimage.current.src.length !== 0 && clothingtypeselect.current.value !== "Select Type of Clothing" && clothingcolorselect.current.value !== "Select Clothing Color") {
@@ -258,6 +266,8 @@ function App() {
           chosenimage.current.src = "https://www.ledr.com/colours/white.jpg";
           clothingtypeselect.current.value = "Select Type of Clothing";
           clothingcolorselect.current.value = "Select Clothing Color";
+          setaddingtowardrobe(false);
+          addtowardrobebutton.current.style.background = 'black';
         })
 
     } else {
@@ -278,12 +288,21 @@ function App() {
     deleteDoc(doc(db, `${User.email + clothing.data().type}`, location.join('')))
   }
 
+  const clothingoptions = useRef();
+  function openclothingoptions() {
+    // if (clothingoptions.current.style.bottom == '-100%') {
+    //   clothingoptions.current.style.bottom = '0%';
+    // } else {
+    //   clothingoptions.current.style.bottom = '-100%';
+    // }
+  }
+
   return (
     <div>
       {
         !User ? <div>
           <img className='w-full h-[100vh]' src="https://i.pinimg.com/originals/81/45/0f/81450f353cdbe7934874fdd467e8af65.jpg" />
-          <div className='absolute text-[1.5rem] flex flex-col items-center top-2/4 left-2/4 w-3/4 h-3/4 bg-white -translate-x-1/2 -translate-y-1/2'>
+          <div className='absolute px-4 text-[1.5rem] flex flex-col items-center top-2/4 left-2/4 w-3/4 h-3/4 bg-white -translate-x-1/2 -translate-y-1/2'>
             <p className='font-bold pt-8 text-[2rem]'>Welcome to ClothingForU!</p>
             <p className='py-4'>Can't decide on what to wear?</p>
             <p>You take pictures of your clothes and we give you outfit suggestions</p>
@@ -332,7 +351,7 @@ function App() {
                           </select>
                           <br/>
                           <div className='mb-4 flex justify-center'>
-                            <button onClick={addToWardrobe} className=' bg-black text-white px-3 py-1 rounded-lg w-[80%]'>Add to Wardrobe!</button>
+                            <button ref={addtowardrobebutton} onClick={addToWardrobe} className=' bg-black text-white px-3 py-1 rounded-lg w-[80%]'>Add to Wardrobe!</button>
                           </div>
                         </div>
                       </div>
@@ -359,17 +378,17 @@ function App() {
                   <div className='text-[4rem] w-full text-center mt-8 border-t-[3px] border-t-gray-400'>My Wardrobe</div>
 
                   {/* wardrobe */}
-                  <div className='relative left-2/4 -translate-x-2/4 w-[80vw] h-[150vh]'>
-                    <img className='w-full h-full mt-8 absolute' src={WardrobeImg}/>
+                  <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[80vh] md:h-[150vh]'>
+                    <img className='w-full h-full mt-8 absolute wardrobeimg' src={WardrobeImg}/>
                     <div className='absolute text-white font-bold text-[1.5rem] top-[20%] left-[12%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shoesarr.map(shoe => {
-                            return <SwiperSlide className='w-full h-full flex items-start slide' id={shoe.id}>
+                            return <SwiperSlide className='w-full h-full slide' onClick={openclothingoptions} id={shoe.id}>
                               <img className='w-full h-full object-contain' src={shoe.data().url}/>
-                              <div className='clothingoptions'>
-                                <button onClick={() => deleteclothing(shoe)} className='deleteclothing'>Delete</button>
+                              <div ref={clothingoptions} className='clothingoptions'>
+                                <button onClick={() => deleteclothing(shoe)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
                               </div>
                             </SwiperSlide>
                           })
@@ -381,7 +400,12 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                       {
                         jacketsarr.map(jacket => {
-                          return <SwiperSlide className='w-[3rem] h-[3rem]' id={jacket.id}><img className='w-full h-full object-contain' src={jacket.data().url}/></SwiperSlide>
+                          return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={jacket.id}>
+                            <img className='w-full h-full object-contain' src={jacket.data().url}/>
+                            <div ref={clothingoptions} className='clothingoptions'>
+                              <button onClick={() => deleteclothing(jacket)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
+                            </div>
+                          </SwiperSlide>
                         })
                       }
                       </Swiper>
@@ -391,7 +415,12 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shirtsarr.map(shirt => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={shirt.id}><img className='w-full h-full object-contain' src={shirt.data().url}/></SwiperSlide>
+                            return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={shirt.id}>
+                              <img className='w-full h-full object-contain' src={shirt.data().url}/>
+                              <div ref={clothingoptions} className='clothingoptions'>
+                                <button onClick={() => deleteclothing(shirt)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
+                              </div>
+                            </SwiperSlide>
                           })
                         }
                       </Swiper>
@@ -401,7 +430,12 @@ function App() {
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           pantsarr.map(pant => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem]' id={pant.id}><img className='w-full h-full object-contain' src={pant.data().url}/></SwiperSlide>
+                            return <SwiperSlide className='w-[3rem] h-[3rem] slide' onClick={openclothingoptions} id={pant.id}>
+                              <img className='w-full h-full object-contain' src={pant.data().url}/>
+                              <div ref={clothingoptions} className='clothingoptions'>
+                                <button onClick={() => deleteclothing(pant)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
+                              </div>
+                            </SwiperSlide>
                           })
                         }
                       </Swiper>
