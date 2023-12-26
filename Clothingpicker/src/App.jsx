@@ -41,6 +41,7 @@ function App() {
   //gets location when page loads and puts in all the weather data
   const city = useRef();
   const weather = useRef();
+  const weatherimg = useRef();
   const temperature = useRef();
   const humidity = useRef();
   const pressure = useRef();
@@ -69,7 +70,6 @@ function App() {
               }
               return;
             }
-            city.current.textContent = data.name + ", " + data.sys.country;
             let description = data.weather[0].description.split(' ');
             let newdescription = [];
             description.forEach(word => {
@@ -77,7 +77,9 @@ function App() {
               let end = word.substring(1);
               newdescription.push(first + end);
             })
+            city.current.textContent = data.name + ", " + data.sys.country;
             weather.current.textContent = newdescription.join(' ');
+            weatherimg.current.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
             temperature.current.textContent = Math.round((((data.main.temp) - 273.15) * (9/5)) + 32) + "°F";
             humidity.current.textContent = " Humidity: " + data.main.humidity + "%";
             pressure.current.textContent = " Pressure: " + data.main.pressure + " millibars";
@@ -291,18 +293,196 @@ function App() {
     deleteDoc(doc(db, `${User.email + clothing.data().type}`, location.join('')))
   }
 
-  // function getweatheroutfit() {
-  //   let temp = temperature.current.textContent.split('');
-  //   temp.splice(-2)
-  //   temp = temp.join('');
-  //   if (temp >= 80) {
 
-  //   } else if (temp >= 70) {
+  //gets recommended outfit for the weather when page loads
+  const weatheroutfit = useRef();
+  const weatherjacket = useRef();
+  const weathershirt = useRef();
+  const weatherpants = useRef();
+  function shuffle(arr) {
+    let shuffled = arr
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
+    return shuffled;
+  }
+  if (User) {
+    setTimeout(() => {
+      let temp = temperature.current.textContent.split('');
+      temp.splice(-2)
+      temp = temp.join('');
 
-  //   } else {
+      let w = weather.current.textContent;
+      if (w.toLowerCase() == "shower rain" || w.toLowerCase() == "rain" || w.toLowerCase() == "thunderstorm" || w.toLowerCase() == "snow" || w.toLowerCase() == "mist") {
+        let jacketarr = [];
+        onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
+          snapshot.docs.forEach(jacket => {
+            jacketarr.push(jacket.data());
+          })
+          let shuffledarr = shuffle(jacketarr);
+          let num = Math.floor(Math.random() * shuffledarr.length)
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherjacket.current.src = shuffledarr[num].url;
+          }
+        })
 
-  //   }
-  // }
+        let shirtsarr = [];
+        onSnapshot(collection(db, `${User.email}shirt`), (snapshot) => {
+          snapshot.docs.forEach(shirt => {
+            if (shirt.data().specifictype == "Shirt") {
+              shirtsarr.push(shirt.data());
+            }
+          })
+          let shuffledarr = shuffle(shirtsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weathershirt.current.src = shuffledarr[num].url;
+          }
+        })
+
+        let pantsarr = [];
+        onSnapshot(collection(db, `${User.email}pants`), (snapshot) => {
+          snapshot.docs.forEach(pant => {
+            if (pant.data().specifictype == "Pants") {
+              pantsarr.push(pant.data());
+            }
+          })
+          let shuffledarr = shuffle(pantsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherpants.current.src = shuffledarr[num].url;
+          }
+        })
+      } else if (temp >= 80) {
+        let shirtsarr = [];
+        onSnapshot(collection(db, `${User.email}shirt`), (snapshot) => {
+          snapshot.docs.forEach(shirt => {
+            if (shirt.data().specifictype == "T-Shirt") {
+              shirtsarr.push(shirt.data());
+            }
+          })
+          let shuffledarr = shuffle(shirtsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weathershirt.current.src = shuffledarr[num].url;
+          }
+        })
+
+        let pantsarr = [];
+        onSnapshot(collection(db, `${User.email}pants`), (snapshot) => {
+          snapshot.docs.forEach(pant => {
+            if (pant.data().specifictype == "Shorts") {
+              pantsarr.push(pant.data());
+            }
+          })
+          let shuffledarr = shuffle(pantsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherpants.current.src = shuffledarr[num].url;
+          }
+        })
+  
+      } else if (temp >= 70) {
+        let shirtsarr = [];
+        onSnapshot(collection(db, `${User.email}shirt`), (snapshot) => {
+          snapshot.docs.forEach(shirt => {
+            if (shirt.data().specifictype == "Shirt") {
+              shirtsarr.push(shirt.data());
+            }
+          })
+          let shuffledarr = shuffle(shirtsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weathershirt.current.src = shuffledarr[num].url;
+          }
+        })
+
+        let pantsarr = [];
+        onSnapshot(collection(db, `${User.email}pants`), (snapshot) => {
+          snapshot.docs.forEach(pant => {
+            if (pant.data().specifictype == "Pants") {
+              pantsarr.push(pant.data());
+            }
+          })
+          let shuffledarr = shuffle(pantsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherpants.current.src = shuffledarr[num].url;
+          }
+        })
+      } else {
+        let jacketarr = [];
+        onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
+          snapshot.docs.forEach(jacket => {
+            jacketarr.push(jacket.data());
+          })
+          let shuffledarr = shuffle(jacketarr);
+          let num = Math.floor(Math.random() * shuffledarr.length)
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherjacket.current.src = shuffledarr[num].url;
+          }
+        })
+
+        let shirtsarr = [];
+        onSnapshot(collection(db, `${User.email}shirt`), (snapshot) => {
+          snapshot.docs.forEach(shirt => {
+            if (shirt.data().specifictype == "Shirt") {
+              shirtsarr.push(shirt.data());
+            }
+          })
+          let shuffledarr = shuffle(shirtsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weathershirt.current.src = shuffledarr[num].url;
+          }
+        })
+
+        let pantsarr = [];
+        onSnapshot(collection(db, `${User.email}pants`), (snapshot) => {
+          snapshot.docs.forEach(pant => {
+            if (pant.data().specifictype == "Pants") {
+              pantsarr.push(pant.data());
+            }
+          })
+          let shuffledarr = shuffle(pantsarr);
+          let num = Math.floor(Math.random() * shuffledarr.length);
+          if (shuffledarr.length == 0) {
+            weatheroutfit.current.textContent = "Not enough items in wardrobe to create outfit";
+            return;
+          } else {
+            weatherpants.current.src = shuffledarr[num].url;
+          }
+        })
+      }
+    }, 300);
+  }
 
   return (
     <div>
@@ -369,9 +549,12 @@ function App() {
                       <div className='bg-gradient-to-r from-teal-600 to-blue-600 w-[49%] p-8 flex flex-col items-center rounded-md'>
                         <input placeholder='Change your city' className='border border-black p-[3px] pl-[0.5rem] w-[50%] ' onKeyDown={(e) => getWeather(e)} type="text" />
                         <p className='text-white my-2'>{new Date().toDateString()}</p>
-                        <p className='text-white font-bold text-[1.5rem]' ref={city}></p>
+                        <p className='text-white font-bold text-[1.5rem] text-center' ref={city}></p>
                         <p className='text-white my-3' ref={weather}></p>
-                        <p className='text-white my-3 text-[2.5rem]' ref={temperature}></p>
+                        <div className='text-white my-3 text-[2.5rem] flex items-center justify-center w-full'>
+                          <img className='h-[4rem] w-[4rem] mr-8' ref={weatherimg}/>
+                          <p ref={temperature}></p>
+                        </div>
                         <div className='flex items-center my-3 text-white'>
                           <CiDroplet/>
                           <p className='mx-1' ref={humidity}></p>|
@@ -386,12 +569,18 @@ function App() {
                   </div>
 
                   <div className='w-full h-[60vh] flex mt-8 border-t-[3px] border-t-gray-400'>
-                    <div className='w-2/4 border-r-[3px] border-gray-400'>
-                      <p className='text-[1.5rem] text-center mt-4'>Outfit recommended for <span ref={city}></span> weather</p>
+                    <div className='w-2/4 border-r-[3px] border-gray-400 relative'>
+                      <p className='text-[1.5rem] text-center mt-4'>Outfit recommended for current weather conditions</p>
+                      <div ref={weatheroutfit} className='text-[2rem] px-8 pt-8 text-center w-full h-[45vh] bg-gray-100 rounded-lg mt-4 absolute'>
+                        <img className='w-[6rem] h-[6rem]' ref={weatherjacket}/>
+                        <img className='w-[6rem] h-[6rem]' ref={weathershirt}/>
+                        <img className='w-[6rem] h-[6rem]' ref={weatherpants}/>
+                      </div>
                     </div>
-                    <div className='w-2/4'>
+                    <div className='w-2/4 flex items-center flex-col'>
                       <p className='text-[1.5rem] text-center mt-4'>My Outfit</p>
                       <p className='text-center text-[1.2rem]'>Pick out your outfit in the wardrobe below!</p>
+                      <button className='px-8 py-[3px] border border-black rounded-[10px] w-[80%] mt-4 bg-gradient-to-r from-green-400 to-green-500'>Can't Decide? Generate a random outfit!</button>
                     </div>
                   </div>
 
