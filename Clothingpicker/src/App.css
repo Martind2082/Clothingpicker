@@ -23,16 +23,17 @@
 }
 
 .clothingoptions {
-  width: 8rem;
+  width: 7.5rem;
   height: 7rem;
   position: absolute;
   right: 0;
   bottom: -100%;
-  /* background: white; */
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   transition: 1s;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .slide:hover .clothingoptions {
   bottom: 0%;
@@ -41,9 +42,17 @@
   bottom: 0%;
 }
 
-@media screen and (max-width: 725) {
+@media screen and (max-width: 768px) {
   .wardrobeimg {
     width: 100%;
   }
-  
+  .clothingoptions {
+    width: 4rem;
+  }
+  .clothingoptions button {
+    font-size: 0.7rem;
+  }
+  .slide:hover .clothingoptions {
+    bottom: 15%;
+  }
 }

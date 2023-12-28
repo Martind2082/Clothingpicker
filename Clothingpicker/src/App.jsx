@@ -12,9 +12,13 @@ import WardrobeImg from './Images/Wardrobeimg.png';
 import {storage} from './Firebase';
 import { deleteObject, getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
 import {v4} from 'uuid';
-import {Swiper, SwiperSlide} from "swiper/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';
+// import 'swiper/components/navigation/navigation.min.css';
+// import 'swiper/components/pagination/pagination.min.css';
+import { FaChevronLeft } from "react-icons/fa6";
+import { FaChevronRight } from "react-icons/fa6";
 
 
 function App() {
@@ -596,13 +600,22 @@ function App() {
     }
   }
 
+  const jacketswiper = useRef();
+  function jacketswipeleft() {
+    jacketswiper.current.swiper.slidePrev();
+    // theswiper.current.swiper.slideNext();
+    // theswiper.current.swiper.slidePrev()
+  }
+  function jacketswiperight() {
+    jacketswiper.current.swiper.slideNext();
+  }
   return (
     <div>
       {
         !User ? <div>
-          <img className='w-full h-[100vh]' src="https://i.pinimg.com/originals/81/45/0f/81450f353cdbe7934874fdd467e8af65.jpg" />
-          <div className='absolute px-4 text-[1.5rem] flex flex-col items-center top-2/4 left-2/4 w-3/4 h-3/4 bg-white -translate-x-1/2 -translate-y-1/2'>
-            <p className='font-bold pt-8 text-[2rem]'>Welcome to ClothingForU!</p>
+          <img className='w-full h-[100vh] object-cover' src="https://i.pinimg.com/originals/81/45/0f/81450f353cdbe7934874fdd467e8af65.jpg" />
+          <div className='absolute px-4 text-[1rem] md:text-[1.5rem] flex flex-col items-center top-2/4 left-2/4 w-[95%] rounded-lg md:w-3/4 h-3/4 bg-white -translate-x-1/2 -translate-y-1/2'>
+            <p className='font-bold pt-8 text-[1.5rem] md:text-[2rem] text-center'>Welcome to ClothingForU!</p>
             <p className='py-4'>Can't decide on what to wear?</p>
             <p>You take pictures of your clothes and we give you outfit suggestions</p>
             <p className='py-4'>Outfits are personalized depending on the weather of your location</p>
@@ -618,12 +631,12 @@ function App() {
               !Location ? <div className='bg-gradient-to-r from-teal-600 to-blue-600 w-[80%] p-8 rounded-md'>
               <p className='text-[1.5rem] text-center text-white mb-8'>Enter your City to find the clothing that matches with the weather</p>
               <div className='flex items-center w-full justify-center'>
-                <input placeholder='Enter your City' className='border border-black p-[3px] w-[50%]' onKeyDown={(e) => getWeather(e)} type="text" />
+                <input placeholder='Enter your City' className='border border-black p-[3px] px-3 w-[90%] md:w-[50%]' onKeyDown={(e) => getWeather(e)} type="text" />
               </div>
             </div> : <div>
                     {/* the add item to wardrobe box and the weather data box */}
-                    <div className='flex w-full justify-between px-4'>
-                      <div className='w-[49%] bg-gray-100 rounded-md'>
+                    <div className='flex flex-col md:flex-row w-full justify-between px-4'>
+                      <div className='w-full md:w-[49%] bg-gray-100 rounded-md mb-4 md:mb-0'>
                         <div>
                           <p className='text-xl text-center my-3'>Add item to Wardrobe</p>
                           <p className='ml-4 mb-4'>Choose your clothing photo</p>
@@ -658,7 +671,7 @@ function App() {
                         </div>
                       </div>
 
-                      <div className='bg-gradient-to-r from-teal-600 to-blue-600 w-[49%] p-8 flex flex-col items-center rounded-md'>
+                      <div className='bg-gradient-to-r from-teal-600 to-blue-600 w-full md:w-[49%] p-8 flex flex-col items-center rounded-md'>
                         <input placeholder='Change your city' className='border border-black p-[3px] pl-[0.5rem] w-[50%] ' onKeyDown={(e) => getWeather(e)} type="text" />
                         <p className='text-white my-2'>{new Date().toDateString()}</p>
                         <p className='text-white font-bold text-[1.5rem] text-center' ref={city}></p>
@@ -680,40 +693,40 @@ function App() {
                       </div>
                   </div>
 
-                  <div className='w-full h-[80vh] flex mt-8 border-t-[3px] border-t-gray-400'>
-                    <div className='w-2/4 border-r-[3px] border-gray-400 relative'>
+                  <div className='relative w-full flex flex-col md:flex-row px-4 md:px-0 mt-8 border-t-[3px] border-t-gray-400'>
+                    <div className='w-full h-[40rem] md:w-2/4 md:border-r-[3px] border-gray-400 relative'>
                       <p className='text-[1.5rem] text-center mt-4'>Outfit recommended for current weather conditions</p>
-                      <div ref={weatheroutfit} className='text-[2rem] px-8 py-4 pt-8 text-center w-full h-[65vh] bg-gray-100 rounded-lg mt-4 absolute flex flex-col items-center'>
+                      <div ref={weatheroutfit} className='text-[2rem] px-8 pb-8 mt-8 text-center w-full rounded-lg absolute flex flex-col items-center bg-gray-100'>
                         <p ref={weatheroutfitmessage} className='text-[1.3rem] mb-2'></p>
                         <p ref={weatheroutfitmessage2} className='text-[1.3rem] mb-[1.5rem]'></p>
-                        <img className='w-[6rem] h-[6rem]' ref={weatherjacket}/>
-                        <img className='w-[6rem] h-[6rem]' ref={weathershirt}/>
-                        <img className='w-[6rem] h-[6rem]' ref={weatherpants}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[10rem] h-[10rem]' ref={weatherjacket}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[10rem] h-[10rem]' ref={weathershirt}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[10rem] h-[10rem]' ref={weatherpants}/>
                       </div>
                     </div>
-                    <div className='w-2/4 flex items-center flex-col'>
+                    <div className='w-full md:w-2/4 h-[50rem] mt-[5rem] md:mt-0 flex items-center flex-col border-t-[3px] border-gray-400 md:border-none'>
                       <p className='text-[1.5rem] text-center mt-4'>My Outfit</p>
                       <p className='text-center text-[1.2rem]'>Pick out your outfit in the wardrobe below!</p>
                       <button onClick={generateoutfit} className='px-8 py-[3px] border border-black rounded-[10px] w-[80%] mt-4 mb-2 bg-gradient-to-r from-green-400 to-green-500'>Can't Decide? Generate a random outfit!</button>
                       <p ref={generatemissingclothes}></p>
                       <div className='mt-8 bg-gray-100 rounded-lg w-full py-8 flex flex-col items-center'>
-                        <img className='w-[6rem] h-[6rem]' ref={generatejacket}/>
-                        <img className='w-[6rem] h-[6rem]' ref={generateshirt}/>
-                        <img className='w-[6rem] h-[6rem]' ref={generatepants}/>
-                        <img className='w-[6rem] h-[6rem]' ref={generateshoes}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[9rem] h-[9rem]' ref={generatejacket}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[9rem] h-[9rem]' ref={generateshirt}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[9rem] h-[9rem]' ref={generatepants}/>
+                        <img className='md:w-[6rem] md:h-[6rem] w-[9rem] h-[9rem]' ref={generateshoes}/>
                       </div>
                     </div>
                   </div>
 
-                  <div className='w-full text-center mt-8 border-t-[3px] border-t-gray-400'>
-                    <p className='text-[4rem]'>My Wardrobe</p>
+                  <div className='w-full text-center mt-[3rem] md:mt-0 border-t-[3px] border-t-gray-400'>
+                    <p className='text-[2rem] md:text-[4rem] mt-8'>My Wardrobe</p>
                     <div className='text-[1.2rem] mt-4 px-[4rem]'>To add a clothing item to your outfit or delete an item, hover over it or click on it if you are on a mobile device</div>
                   </div>
 
                   {/* wardrobe */}
-                  <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[80vh] md:h-[120vh]'>
+                  <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[95vh] md:h-[120vh]'>
                     <img className='w-full h-full mt-8 absolute wardrobeimg' src={WardrobeImg}/>
-                    <div className='absolute text-white font-bold text-[1.5rem] top-[20%] left-[12%]'>Shoes</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[25%] md:top-[20%] left-[10%] md:left-[12%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
@@ -722,19 +735,24 @@ function App() {
                               <img className='w-full h-full object-contain' src={shoe.data().url}/>
                               <div className='clothingoptions flex flex-col items-center'>
                                 <button onClick={() => deleteclothing(shoe)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
-                                <button onClick={() => addtooutfit(shoe)} className='bg-white h-min px-3 rounded-md border border-black mt-2'>Add to my Outfit</button>
+                                <button onClick={() => addtooutfit(shoe)} className='bg-white h-min rounded-md border border-black mt-2'>Add to my Outfit</button>
                               </div>
                             </SwiperSlide>
                           })
                         }
                       </Swiper>
                     </div>
-                    <div className='absolute text-white font-bold text-[1.5rem] top-[40%] left-[10%] w-[4rem]'>Jackets and Hoodies</div>
-                    <div ref={wardrobejackets} className='absolute w-[50%] h-[10rem] top-[40%] left-[25%]'>
-                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[45%] md:top-[40%] left-[7%] md:left-[10%] w-[4rem]'>Jackets and Hoodies</div>
+                    <div ref={wardrobejackets} className='absolute w-[50%] h-[10rem] top-[40%] left-[25%] flex'>
+                      <FaChevronLeft onClick={jacketswipeleft} className='absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <Swiper ref={jacketswiper} className='w-full h-full overflow-hidden' 
+                      slidesPerView={3}
+                      spaceBetween={0}
+                      loop={true}
+                      >
                       {
                         jacketsarr.map(jacket => {
-                          return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={jacket.id}>
+                          return <SwiperSlide className='w-full h-full slide'  id={jacket.id}>
                             <img className='w-full h-full object-contain' src={jacket.data().url}/>
                             <div className='clothingoptions flex flex-col items-center'>
                               <button onClick={() => deleteclothing(jacket)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black'>Delete</button>
@@ -744,13 +762,14 @@ function App() {
                         })
                       }
                       </Swiper>
+                      <FaChevronRight onClick={jacketswiperight} className='absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
-                    <div className='absolute text-white font-bold text-[1.5rem] top-[60%] left-[12%]'>Shirts</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[65%] md:top-[60%] left-[8%] md:left-[12%]'>Shirts</div>
                     <div ref={wardrobeshirts} className='absolute w-[50%] h-[10rem] top-[55%] left-[25%]'>
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           shirtsarr.map(shirt => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={shirt.id}>
+                            return <SwiperSlide className='w-full h-full slide'  id={shirt.id}>
                               <img className='w-full h-full object-contain' src={shirt.data().url}/>
                               <div className='clothingoptions flex flex-col items-center'>
                                 <button onClick={() => deleteclothing(shirt)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
@@ -761,12 +780,12 @@ function App() {
                         }
                       </Swiper>
                     </div>
-                    <div className='absolute text-white font-bold text-[1.5rem] top-[72%] left-[10%] w-[4rem]'>Pants and Shorts</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[77%] md:top-[72%] left-[8%] md:left-[10%] w-[4rem]'>Pants and Shorts</div>
                     <div ref={wardrobepants} className='absolute w-[50%] h-[10rem] top-[72%] left-[25%]'>
                       <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
                         {
                           pantsarr.map(pant => {
-                            return <SwiperSlide className='w-[3rem] h-[3rem] slide'  id={pant.id}>
+                            return <SwiperSlide className='w-full h-full slide'  id={pant.id}>
                               <img className='w-full h-full object-contain' src={pant.data().url}/>
                               <div className='clothingoptions flex flex-col items-center'>
                                 <button onClick={() => deleteclothing(pant)} className='deleteclothing bg-white h-min px-3 rounded-md border border-black mt-2'>Delete</button>
@@ -778,7 +797,6 @@ function App() {
                       </Swiper>
                     </div>
                   </div>
-
             </div> 
             }
           </div>
