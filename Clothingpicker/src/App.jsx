@@ -323,7 +323,7 @@ function App() {
   
         let w = weather.current.textContent;
         if (w.toLowerCase() == "shower rain" || w.toLowerCase() == "rain" || w.toLowerCase() == "thunderstorm" || w.toLowerCase() == "snow" || w.toLowerCase() == "mist") {
-          weatheroutfitmessage2.current.textContent = `The weather is ${w.toLowerCase()}, so so you should wear a jacket, a long sleeve shirt, and pants`;
+          weatheroutfitmessage2.current.textContent = `The weather is ${w.toLowerCase()}, so you should wear a jacket, a long sleeve shirt, and pants`;
           
           let jacketarr = [];
           onSnapshot(collection(db, `${User.email}jacket`), (snapshot) => {
@@ -601,13 +601,44 @@ function App() {
   }
 
   const jacketswiper = useRef();
-  function jacketswipeleft() {
-    jacketswiper.current.swiper.slidePrev();
-    // theswiper.current.swiper.slideNext();
-    // theswiper.current.swiper.slidePrev()
-  }
   function jacketswiperight() {
-    jacketswiper.current.swiper.slideNext();
+    if (jacketswiper.current) {
+      if (!jacketswiper.current.swiper.activeIndex) {
+        jacketswiper.current.swiper.slideTo(1);
+      } else {
+        jacketswiper.current.swiper.slideNext();
+      }
+    }
+  }
+  const shoeswiper = useRef();
+  function shoeswiperright() {
+    if (shoeswiper.current) {
+      if (!shoeswiper.current.swiper.activeIndex) {
+        shoeswiper.current.swiper.slideTo(1);
+      } else {
+        shoeswiper.current.swiper.slideNext();
+      }
+    }
+  }
+  const shirtswiper = useRef();
+  function shirtswiperright() {
+    if (shirtswiper.current) {
+      if (!shirtswiper.current.swiper.activeIndex) {
+        shirtswiper.current.swiper.slideTo(1);
+      } else {
+        shirtswiper.current.swiper.slideNext();
+      }
+    }
+  }
+  const pantsswiper = useRef();
+  function pantsswiperright() {
+    if (pantsswiper.current) {
+      if (!pantsswiper.current.swiper.activeIndex) {
+        pantsswiper.current.swiper.slideTo(1);
+      } else {
+        pantsswiper.current.swiper.slideNext();
+      }
+    }
   }
   return (
     <div>
@@ -704,7 +735,7 @@ function App() {
                         <img className='md:w-[6rem] md:h-[6rem] w-[10rem] h-[10rem]' ref={weatherpants}/>
                       </div>
                     </div>
-                    <div className='w-full md:w-2/4 h-[50rem] mt-[5rem] md:mt-0 flex items-center flex-col border-t-[3px] border-gray-400 md:border-none'>
+                    <div className='w-full md:w-2/4 h-[50rem] mt-[7rem] md:mt-0 flex items-center flex-col border-t-[3px] border-gray-400 md:border-none'>
                       <p className='text-[1.5rem] text-center mt-4'>My Outfit</p>
                       <p className='text-center text-[1.2rem]'>Pick out your outfit in the wardrobe below!</p>
                       <button onClick={generateoutfit} className='px-8 py-[3px] border border-black rounded-[10px] w-[80%] mt-4 mb-2 bg-gradient-to-r from-green-400 to-green-500'>Can't Decide? Generate a random outfit!</button>
@@ -718,7 +749,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className='w-full text-center mt-[3rem] md:mt-0 border-t-[3px] border-t-gray-400'>
+                  <div className='w-full text-center mt-[5rem] md:mt-0 border-t-[3px] border-t-gray-400'>
                     <p className='text-[2rem] md:text-[4rem] mt-8'>My Wardrobe</p>
                     <div className='text-[1.2rem] mt-4 px-[4rem]'>To add a clothing item to your outfit or delete an item, hover over it or click on it if you are on a mobile device</div>
                   </div>
@@ -728,7 +759,8 @@ function App() {
                     <img className='w-full h-full mt-8 absolute wardrobeimg' src={WardrobeImg}/>
                     <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[25%] md:top-[20%] left-[10%] md:left-[12%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
-                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
+                    <FaChevronLeft onClick={() => {shoeswiper.current.swiper.slidePrev()}} className='absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <Swiper ref={shoeswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
                         {
                           shoesarr.map(shoe => {
                             return <SwiperSlide className='w-full h-full slide'  id={shoe.id}>
@@ -741,10 +773,11 @@ function App() {
                           })
                         }
                       </Swiper>
+                      <FaChevronRight onClick={shoeswiperright} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
                     <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[45%] md:top-[40%] left-[7%] md:left-[10%] w-[4rem]'>Jackets and Hoodies</div>
                     <div ref={wardrobejackets} className='absolute w-[50%] h-[10rem] top-[40%] left-[25%] flex'>
-                      <FaChevronLeft onClick={jacketswipeleft} className='absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <FaChevronLeft onClick={() => {jacketswiper.current.swiper.slidePrev();}} className='navbutton absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                       <Swiper ref={jacketswiper} className='w-full h-full overflow-hidden' 
                       slidesPerView={3}
                       spaceBetween={0}
@@ -762,11 +795,12 @@ function App() {
                         })
                       }
                       </Swiper>
-                      <FaChevronRight onClick={jacketswiperight} className='absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <FaChevronRight onClick={jacketswiperight} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
                     <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[65%] md:top-[60%] left-[8%] md:left-[12%]'>Shirts</div>
                     <div ref={wardrobeshirts} className='absolute w-[50%] h-[10rem] top-[55%] left-[25%]'>
-                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
+                    <FaChevronLeft onClick={() => {shirtswiper.current.swiper.slidePrev();}} className='navbutton absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <Swiper ref={shirtswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
                         {
                           shirtsarr.map(shirt => {
                             return <SwiperSlide className='w-full h-full slide'  id={shirt.id}>
@@ -779,10 +813,12 @@ function App() {
                           })
                         }
                       </Swiper>
+                      <FaChevronRight onClick={shirtswiperright} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
                     <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[77%] md:top-[72%] left-[8%] md:left-[10%] w-[4rem]'>Pants and Shorts</div>
                     <div ref={wardrobepants} className='absolute w-[50%] h-[10rem] top-[72%] left-[25%]'>
-                      <Swiper className='w-full h-full overflow-hidden' slidesPerView={3}>
+                    <FaChevronLeft onClick={() => {pantsswiper.current.swiper.slidePrev();}} className='navbutton absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
+                      <Swiper ref={pantsswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
                         {
                           pantsarr.map(pant => {
                             return <SwiperSlide className='w-full h-full slide'  id={pant.id}>
@@ -795,6 +831,7 @@ function App() {
                           })
                         }
                       </Swiper>
+                      <FaChevronRight onClick={pantsswiperright} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
                   </div>
             </div> 
