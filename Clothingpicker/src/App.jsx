@@ -314,6 +314,7 @@ function App() {
   }
   async function getweatheroutfit() {
     if (User) {
+      if (Location == "") return
       setTimeout(() => {
         let temp = temperature.current.textContent.split('');
         temp.splice(-2)
@@ -669,7 +670,7 @@ function App() {
                         <div>
                           <p className='text-xl text-center my-3'>Add item to Wardrobe</p>
                           <p className='ml-4 mb-4'>Choose your clothing photo</p>
-                          <input className='ml-4 mb-4' ref={imageinput} type="file" accept='image/png, image/jpg' onChange={addImage}/>
+                          <input className='ml-4 mb-4' ref={imageinput} type="file" accept='image/png, image/jpg'  onChange={addImage}/>
                           <div className='ml-4  mb-4 w-[10rem] h-[10rem] border-black border-2 rounded-[10px] bg-white'>
                             <img className='w-full h-full rounded-[10px] object-contain' ref={chosenimage} />
                           </div>
