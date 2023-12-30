@@ -2,21 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import './index.css';
 import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut} from 'firebase/auth';
-import {app, auth, db} from './Firebase';
+import {auth, db} from './Firebase';
 import GoogleButton from 'react-google-button';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { FaWind } from "react-icons/fa";
 import { FaGauge } from "react-icons/fa6";
 import { CiDroplet } from "react-icons/ci";
 import WardrobeImg from './Images/Wardrobeimg.png';
 import {storage} from './Firebase';
-import { deleteObject, getDownloadURL, listAll, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import {v4} from 'uuid';
 import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/swiper-bundle.min.css';
 import 'swiper/swiper.min.css';
-// import 'swiper/components/navigation/navigation.min.css';
-// import 'swiper/components/pagination/pagination.min.css';
 import { FaChevronLeft } from "react-icons/fa6";
 import { FaChevronRight } from "react-icons/fa6";
 
@@ -761,7 +759,7 @@ function App() {
                   {/* wardrobe */}
                   <div className='relative left-2/4 -translate-x-2/4 w-[98vw] md:w-[80vw] h-[95vh] md:h-[120vh]'>
                     <img className='w-full h-full mt-8 absolute wardrobeimg' src={WardrobeImg}/>
-                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[25%] md:top-[20%] left-[10%] md:left-[12%]'>Shoes</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[25%] md:top-[20%] left-[7%] md:left-[10%]'>Shoes</div>
                     <div ref={wardrobeshoes} className='absolute w-[50%] h-[10rem] top-[15%] left-[25%]'>
                     <FaChevronLeft onClick={() => {shoeswiper.current.swiper.slidePrev()}} className='absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                       <Swiper ref={shoeswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
@@ -801,7 +799,7 @@ function App() {
                       </Swiper>
                       <FaChevronRight onClick={jacketswiperight} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
-                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[65%] md:top-[60%] left-[8%] md:left-[12%]'>Shirts</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[65%] md:top-[60%] left-[7%] md:left-[10%]'>Shirts</div>
                     <div ref={wardrobeshirts} className='absolute w-[50%] h-[10rem] top-[55%] left-[25%]'>
                     <FaChevronLeft onClick={() => {shirtswiper.current.swiper.slidePrev();}} className='navbutton absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                       <Swiper ref={shirtswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
@@ -819,7 +817,7 @@ function App() {
                       </Swiper>
                       <FaChevronRight onClick={shirtswiperright} className='navbutton absolute top-2/4 -translate-y-1/2 right-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                     </div>
-                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[77%] md:top-[72%] left-[8%] md:left-[10%] w-[4rem]'>Pants and Shorts</div>
+                    <div className='absolute text-white font-bold text-base md:text-[1.5rem] top-[77%] md:top-[72%] left-[7%] md:left-[10%] w-[4rem]'>Pants and Shorts</div>
                     <div ref={wardrobepants} className='absolute w-[50%] h-[10rem] top-[72%] left-[25%]'>
                     <FaChevronLeft onClick={() => {pantsswiper.current.swiper.slidePrev();}} className='navbutton absolute top-2/4 -translate-y-1/2 left-[-1.2rem] z-10 text-[2rem] text-blue-500 hover:cursor-pointer'/>
                       <Swiper ref={pantsswiper} className='w-full h-full overflow-hidden' slidesPerView={3} loop={true}>
