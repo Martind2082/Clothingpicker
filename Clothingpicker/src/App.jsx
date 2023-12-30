@@ -694,6 +694,10 @@ function App() {
                             <option>Green</option>
                             <option>Blue</option>
                             <option>Purple</option>
+                            <option>Black</option>
+                            <option>Brown</option>
+                            <option>Gray</option>
+                            <option>White</option>
                           </select>
                           <br/>
                           <div className='mb-4 flex justify-center'>
@@ -735,7 +739,7 @@ function App() {
                         <img className='md:w-[6rem] md:h-[6rem] w-[10rem] h-[10rem]' ref={weatherpants}/>
                       </div>
                     </div>
-                    <div className='w-full md:w-2/4 h-[50rem] mt-[7rem] md:mt-0 flex items-center flex-col border-t-[3px] border-gray-400 md:border-none'>
+                    <div className='w-full md:w-2/4 h-[50rem] mt-[13rem] md:mt-0 flex items-center flex-col border-t-[3px] border-gray-400 md:border-none'>
                       <p className='text-[1.5rem] text-center mt-4'>My Outfit</p>
                       <p className='text-center text-[1.2rem]'>Pick out your outfit in the wardrobe below!</p>
                       <button onClick={generateoutfit} className='px-8 py-[3px] border border-black rounded-[10px] w-[80%] mt-4 mb-2 bg-gradient-to-r from-green-400 to-green-500'>Can't Decide? Generate a random outfit!</button>
